@@ -3,10 +3,15 @@ package server
 import (
 	"net/http"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 )
 
-func NewRouter() *echo.Echo {
+type Dependencies struct {
+	DB *pgxpool.Pool
+}
+
+func NewRouter(deps *Dependencies) *echo.Echo {
 	e := echo.New()
 
 	e.GET("/health", func(c echo.Context) error {
