@@ -1,2 +1,4 @@
- go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest
- migrate create -ext sql -dir D:\project\paybridge\paybridge-transaction-service\migrations create_wallets
+Step to migrations
+create a dbconfig.yml
+create folder migrations 
+Generate sql-migrate new create_wallets

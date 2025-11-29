@@ -1,0 +1,5 @@
+development:
+  dialect: postgres
+  datasource: postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable&search_path=${DB_SCHEMA}
+  dir: migrations
+  table: migrations
