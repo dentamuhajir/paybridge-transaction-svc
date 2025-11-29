@@ -37,9 +37,9 @@ func Load() (*Config, error) {
 
 	cfg := &Config{
 		Server: Server{
-			Name: getEnv("SERVER_NAME", "paybridge-transaction-service"),
-			Port: getEnvInt("SERVER_PORT", 8083),
-			Env:  getEnv("SERVER_ENV", "development"),
+			Name: getEnv("APP_NAME", "paybridge-transaction-service"),
+			Port: getEnvInt("APP_PORT", 8083),
+			Env:  getEnv("APP_ENV", "development"),
 		},
 		Database: Database{
 			Host:     getEnv("DB_HOST", "localhost"),

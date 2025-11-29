@@ -9,6 +9,7 @@ import (
 	"paybridge-transaction-service/internal/config"
 	"paybridge-transaction-service/internal/db"
 	"paybridge-transaction-service/internal/server"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -32,9 +33,9 @@ func main() {
 	e := server.NewRouter(deps)
 
 	go func() {
-		log.Println("Server starting on port 8083...")
+		log.Printf("Server starting on port %d...", cfg.Server.Port)
 
-		if err := e.Start(":8083"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":" + strconv.Itoa(cfg.Server.Port)); err != nil && err != http.ErrServerClosed {
 			log.Fatalf(" Server failed: %v", err)
 		}
 	}()
