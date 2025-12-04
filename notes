@@ -1,0 +1,10 @@
+Setup Swagger
+  go install github.com/swaggo/swag/cmd/swag@latest
+
+  go get github.com/swaggo/echo-swagger
+  go get github.com/swaggo/swag
+
+  swag init -g cmd/server/main.go -o docs
+
+  swag init -g cmd/server/main.go
+

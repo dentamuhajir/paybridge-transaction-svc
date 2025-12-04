@@ -1,0 +1,29 @@
+basePath: /api/v1
+info:
+  contact: {}
+  description: API documentation for Transaction Services
+  title: Paybridge Transaction Service API
+  version: "1.0"
+paths:
+  /health/db:
+    get:
+      description: Returns UP if DB is healthy, DOWN otherwise
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check database health
+      tags:
+      - Health
+swagger: "2.0"
