@@ -3,6 +3,8 @@ package server
 import (
 	"paybridge-transaction-service/docs"
 	"paybridge-transaction-service/internal/health"
+	"paybridge-transaction-service/internal/logger"
+	"paybridge-transaction-service/internal/server/middleware"
 	"paybridge-transaction-service/internal/wallet"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -15,7 +17,12 @@ type Dependencies struct {
 }
 
 func NewRouter(deps *Dependencies) *echo.Echo {
+
+	logger.Init()
+
 	e := echo.New()
+
+	e.Use(middleware.TracingMiddleware())
 
 	apiVersion := "/api/v1"
 
