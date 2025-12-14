@@ -7,23 +7,12 @@ import (
 	"os"
 	"os/signal"
 	"paybridge-transaction-service/internal/config"
-	"paybridge-transaction-service/internal/db"
 	"strconv"
 	"syscall"
 	"time"
 )
 
-func Run(cfg *config.Config) error {
-	// Setup DB
-	pg, err := db.NewPostgres(cfg.Database.DSN)
-	if err != nil {
-		return err
-	}
-
-	deps := &Dependencies{
-		DB: pg,
-	}
-
+func Run(cfg *config.Config, deps *Dependencies) error {
 	// Setup router
 	e := NewRouter(deps)
 
