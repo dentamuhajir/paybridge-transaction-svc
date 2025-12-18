@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: paybridge-transaction-svc
+    ports:
+      - "8082:8082"
+    volumes:
+      - .:/app
+      - ~/.cache/go-build:/root/.cache/go-build
+    env_file:
+      - .env
+    networks:
+      - paybridge_network
+    restart: unless-stopped
+
+networks:
+  paybridge_network:
+    external: true
