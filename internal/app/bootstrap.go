@@ -12,6 +12,7 @@ type Bootstrap struct {
 }
 
 func NewBootstrap(cfg *config.Config) *Bootstrap {
+
 	ctr, err := NewContainer(cfg)
 	if err != nil {
 		panic(err)
@@ -25,7 +26,7 @@ func (b *Bootstrap) Start() error {
 	ctx := context.Background()
 
 	// start kafka consumers
-	walletConsumer := consumer.NewWalletCreateConsumer()
+	walletConsumer := consumer.NewWalletCreateConsumer(b.container.Cfg)
 	go walletConsumer.Start(ctx)
 
 	// start HTTP server (blocking)

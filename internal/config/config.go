@@ -12,6 +12,7 @@ import (
 type Config struct {
 	Server   Server
 	Database Database
+	Broker   Broker
 }
 
 type Server struct {
@@ -28,6 +29,10 @@ type Database struct {
 	Password string `env:"DB_PASSWORD"`
 	SSLMode  string `env:"DB_SSLMODE"`
 	DSN      string
+}
+
+type Broker struct {
+	Host string `env:"KAFKA_BROKER"`
 }
 
 // Load loads .env file (if exists) + returns populated Config
@@ -48,6 +53,9 @@ func Load() (*Config, error) {
 			User:     getEnv("DB_USER", ""),
 			Password: getEnv("DB_PASSWORD", ""),
 			SSLMode:  getEnv("DB_SSLMODE", "disable"),
+		},
+		Broker: Broker{
+			Host: getEnv("KAFKA_BROKER", ""),
 		},
 	}
 

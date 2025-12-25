@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"paybridge-transaction-service/internal/config"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -18,12 +19,12 @@ type WalletCreateConsumer struct {
 	//service *wallet.Service
 }
 
-func NewWalletCreateConsumer() *WalletCreateConsumer {
+func NewWalletCreateConsumer(cfg *config.Config) *WalletCreateConsumer {
 	return &WalletCreateConsumer{
 		reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers:        []string{"localhost:29092"},
+			Brokers:        []string{cfg.Broker.Host},
 			Topic:          "wallet",
-			GroupID:        "paybridge-transaction",
+			GroupID:        cfg.Server.Name,
 			CommitInterval: 0,
 		}),
 		// service: s,
