@@ -2,9 +2,9 @@ package server
 
 import (
 	"paybridge-transaction-service/docs"
-	"paybridge-transaction-service/internal/health"
+	"paybridge-transaction-service/internal/domain/health"
 	"paybridge-transaction-service/internal/server/middleware"
-	"paybridge-transaction-service/internal/wallet"
+	"paybridge-transaction-service/internal/domain/wallet"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
