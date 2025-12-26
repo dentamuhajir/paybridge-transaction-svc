@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"paybridge-transaction-service/internal/config"
+	kafkaInfra "paybridge-transaction-service/internal/infra/kafka"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -21,12 +22,7 @@ type WalletCreateConsumer struct {
 
 func NewWalletCreateConsumer(cfg *config.Config) *WalletCreateConsumer {
 	return &WalletCreateConsumer{
-		reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers:        []string{cfg.Broker.Host},
-			Topic:          "wallet",
-			GroupID:        cfg.Server.Name,
-			CommitInterval: 0,
-		}),
+		reader: kafkaInfra.NewReader(cfg, "wallet"),
 		// service: s,
 	}
 }
