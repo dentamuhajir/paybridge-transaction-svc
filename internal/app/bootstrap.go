@@ -26,7 +26,7 @@ func (b *Bootstrap) Start() error {
 	ctx := context.Background()
 
 	// start kafka consumers
-	walletConsumer := consumer.NewWalletCreateConsumer(b.container.Cfg)
+	walletConsumer := consumer.NewWalletCreateConsumer(b.container.Cfg, b.container.Service.WalletService)
 	go walletConsumer.Start(ctx)
 
 	// start HTTP server (blocking)

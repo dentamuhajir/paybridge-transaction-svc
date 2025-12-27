@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"paybridge-transaction-service/internal/config"
+	"paybridge-transaction-service/internal/domain/wallet"
 	kafkaInfra "paybridge-transaction-service/internal/infra/kafka"
 
 	"github.com/segmentio/kafka-go"
@@ -16,14 +17,14 @@ type WalletCreateEvent struct {
 }
 
 type WalletCreateConsumer struct {
-	reader *kafka.Reader
-	//service *wallet.Service
+	reader  *kafka.Reader
+	Service wallet.Service
 }
 
-func NewWalletCreateConsumer(cfg *config.Config) *WalletCreateConsumer {
+func NewWalletCreateConsumer(cfg *config.Config, svc wallet.Service) *WalletCreateConsumer {
 	return &WalletCreateConsumer{
-		reader: kafkaInfra.NewReader(cfg, "wallet"),
-		// service: s,
+		reader:  kafkaInfra.NewReader(cfg, "wallet"),
+		Service: svc,
 	}
 }
 
@@ -36,6 +37,8 @@ func (c *WalletCreateConsumer) Start(ctx context.Context) {
 			log.Println("Fetch error:", err)
 			continue
 		}
+
+		//c.Service.CreateWallet(ctx, wallet.CreateWalletReq{})
 
 		fmt.Printf(
 			"[Kafka] topic=%s key=%s value=%s offset=%d\n",
