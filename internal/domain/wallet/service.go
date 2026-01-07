@@ -9,6 +9,7 @@ import (
 
 type Service interface {
 	CreateWallet(ctx context.Context, req CreateWalletReq) (*CreateWalletResp, error)
+	InquiryWallet(ctx context.Context, userID string) (*InquiryWalletResp, error)
 }
 
 type service struct {
@@ -41,6 +42,21 @@ func (s *service) CreateWallet(ctx context.Context, req CreateWalletReq) (*Creat
 
 	return &CreateWalletResp{
 		ID:      result.ID.String(),
+		UserID:  result.UserID.String(),
+		Balance: result.Balance,
+		Status:  result.Status,
+	}, nil
+
+}
+
+func (s *service) InquiryWallet(ctx context.Context, userID string) (*InquiryWalletResp, error) {
+
+	result, err := s.repo.Get(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &InquiryWalletResp{
 		UserID:  result.UserID.String(),
 		Balance: result.Balance,
 		Status:  result.Status,
