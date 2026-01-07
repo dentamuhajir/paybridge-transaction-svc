@@ -11,3 +11,10 @@ type CreateWalletResp struct {
 	Balance int64  `json:"balance"`
 	Status  string `json:"status"`
 }
+
+type InquiryWalletResp struct {
+	UserID   string `json:"user_id"`
+	Balance  int64  `json:"balance"`
+	Currency string `json:"currency"`
+	Status   string `json:"status"`
+}
