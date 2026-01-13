@@ -12,6 +12,6 @@ type LoanAppCreateReq struct {
 }
 
 type LoanAppCreateResp struct {
-	ID     uuid.UUID `db:"id"`
-	Status string    `db:"status"`
+	ID     string `db:"id"`
+	Status string `db:"status"`
 }

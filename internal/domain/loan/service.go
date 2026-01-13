@@ -38,7 +38,7 @@ func (s *service) Create(ctx context.Context, req dto.LoanAppCreateReq) (*dto.Lo
 	}
 
 	return &dto.LoanAppCreateResp{
-		ID:     result.ID,
+		ID:     result.ID.String(),
 		Status: result.Status,
 	}, nil
 }
