@@ -21,7 +21,7 @@ func NewHandler(svc Service, log *zap.Logger) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(g *echo.Group) {
-	g.POST("/create", h.Create, middleware.ValidateInternalToken)
+	g.POST("/loan-application", h.Create, middleware.ValidateInternalToken)
 }
 
 func (h *Handler) Create(c echo.Context) error {
