@@ -24,12 +24,13 @@ func NewService(r Repository, log *zap.Logger) Service {
 func (s *service) Create(ctx context.Context, req LoanAppCreateRequest) (*LoanAppCreateResponse, error) {
 
 	loan := entity.LoanApplication{
-		UserID:       req.UserID,
-		ProductID:    req.ProductID,
-		Amount:       req.Amount,
-		TenorMonth:   req.TenorMonth,
-		InterestType: req.InterestType,
-		AdminFee:     req.AdminFee,
+		UserID:                  req.UserID,
+		ProductID:               req.ProductID,
+		Amount:                  req.Amount,
+		TenorMonth:              req.TenorMonth,
+		InterestType:            req.InterestType,
+		AdminFee:                req.AdminFee,
+		DisbursementScheduledAt: req.DisbursementScheduledAt,
 	}
 
 	result, err := s.repo.Create(ctx, loan)

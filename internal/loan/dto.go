@@ -1,14 +1,19 @@
 package loan
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type LoanAppCreateRequest struct {
-	UserID       uuid.UUID `json:"user_id"`
-	ProductID    uuid.UUID `json:"product_id"`
-	Amount       int64     `json:"amount"`
-	TenorMonth   int       `json:"tenor_month"`
-	InterestType string    `json:"interest_type"` // FLAT / ANNUITY
-	AdminFee     int64     `json:"admin_fee"`
+	UserID                  uuid.UUID `json:"user_id"`
+	ProductID               uuid.UUID `json:"product_id"`
+	Amount                  int64     `json:"amount"`
+	TenorMonth              int       `json:"tenor_month"`
+	InterestType            string    `json:"interest_type"` // FLAT / ANNUITY
+	DisbursementScheduledAt time.Time `json:"disbursement_scheduled_at"`
+	AdminFee                int64     `json:"admin_fee"`
 }
 
 type LoanAppCreateResponse struct {
