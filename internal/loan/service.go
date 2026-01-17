@@ -2,7 +2,6 @@ package loan
 
 import (
 	"context"
-	"errors"
 	"paybridge-transaction-service/internal/loan/entity"
 	"time"
 
@@ -58,9 +57,6 @@ func (s *service) Approval(ctx context.Context, req LoanApprovalRequest) (*LoanA
 	result, err := s.repo.Approval(ctx, loan)
 
 	if err != nil {
-		if errors.Is(err, ErrLoanNotPendingOrNotFound) {
-			return nil, err
-		}
 		return nil, err
 	}
 
