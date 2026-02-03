@@ -2,6 +2,7 @@ package server
 
 import (
 	"paybridge-transaction-service/docs"
+	"paybridge-transaction-service/internal/account"
 	"paybridge-transaction-service/internal/health"
 	"paybridge-transaction-service/internal/loan"
 	"paybridge-transaction-service/internal/server/middleware"
@@ -44,5 +45,10 @@ func NewRouter(db *pgxpool.Pool, log *zap.Logger) *echo.Echo {
 	loanAppsHandler := loan.NewHandler(loanAppsSvc, log)
 	loanAppsHandler.RegisterRoutes(e.Group((apiVersion)))
 
+	accountRepo := account.NewRepository(db, log)
+	accountSvc := account.NewService(accountRepo, log)
+	accountHandler := account.NewHandler(accountSvc, log)
+	accountHandler.RegisterRoutes(e.Group(apiVersion))
+ 
 	return e
 }
