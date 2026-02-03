@@ -22,6 +22,8 @@ func NewRouter(db *pgxpool.Pool, log *zap.Logger) *echo.Echo {
 
 	apiVersion := "/api/v1"
 
+	internal := "internal"
+
 	// Swagger Information
 	docs.SwaggerInfo.Title = "Paybridge Transaction Service API"
 	docs.SwaggerInfo.Description = "API documentation for Transaction Services"
@@ -48,7 +50,7 @@ func NewRouter(db *pgxpool.Pool, log *zap.Logger) *echo.Echo {
 	accountRepo := account.NewRepository(db, log)
 	accountSvc := account.NewService(accountRepo, log)
 	accountHandler := account.NewHandler(accountSvc, log)
-	accountHandler.RegisterRoutes(e.Group(apiVersion))
- 
+	accountHandler.RegisterInternalRoutes(e.Group(internal))
+
 	return e
 }
