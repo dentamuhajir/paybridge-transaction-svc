@@ -2,7 +2,6 @@ package account
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -64,9 +63,8 @@ func (r *repository) CreateAccountWithBalance(ctx context.Context, userID uuid.U
 	var accountID uuid.UUID
 
 	err = tx.QueryRow(ctx, ` INSERT INTO accounts (owner_id, status) 
-			VALUES ($1, 'ACTIVE') ON CONFLICT (owner_id) 
-			DO NOTHING RETURNING id
-		`, userID).Scan(&accountID)
+			VALUES ($1, $2) ON CONFLICT (owner_id) 
+			DO NOTHING RETURNING id `, userID, StatusActive).Scan(&accountID)
 
 	if err == pgx.ErrNoRows {
 		err = tx.QueryRow(ctx, `
@@ -82,14 +80,20 @@ func (r *repository) CreateAccountWithBalance(ctx context.Context, userID uuid.U
 	_, err = tx.Exec(ctx, `
 	INSERT INTO account_balances (account_id, balance_type_id, amount)
 	VALUES
-		($1, 1, 0), -- CASH
-		($1, 2, 0), -- LOAN_PRINCIPAL
-		($1, 3, 0), -- LOAN_INTEREST
-		($1, 4, 0), -- FEE
-		($1, 5, 0), -- ESCROW
-		($1, 6, 0)  -- RESERVE
-	ON CONFLICT DO NOTHING
-`, accountID)
+		($1, $2, 0), 
+		($1, $3, 0), 
+		($1, $4, 0), -- LOAN_INTEREST
+		($1, $5, 0), -- FEE
+		($1, $6, 0), -- ESCROW
+		($1, $7, 0)  -- RESERVE
+	ON CONFLICT DO NOTHING`,
+		accountID,
+		BalanceTypeCash,
+		BalanceTypeLoanPrincipal,
+		BalanceTypeLoanInterest,
+		BalanceTypeFee,
+		BalanceTypeEscrow,
+		BalanceTypeReserve)
 
 	if err != nil {
 		return err
