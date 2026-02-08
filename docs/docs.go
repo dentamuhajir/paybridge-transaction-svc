@@ -45,6 +45,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
+            "description": "Example \"Bearer b32fd54c1593e77fb4a84\"",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

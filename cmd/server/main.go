@@ -14,6 +14,7 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
+// @description Example "Bearer b32fd54c1593e77fb4a84"
 
 func main() {
 	cfg, err := config.Load()

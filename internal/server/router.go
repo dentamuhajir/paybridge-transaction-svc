@@ -31,7 +31,9 @@ func NewRouter(db *pgxpool.Pool, log *zap.Logger) *echo.Echo {
 	docs.SwaggerInfo.BasePath = internal
 
 	// Swagger route
-	e.GET("/swagger-ui/*", echoSwagger.WrapHandler)
+	e.GET("/swagger-ui/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
+		c.PersistAuthorization = true
+	}))
 
 	healthService := health.NewService(db)
 	healthHandler := health.NewHandler(*healthService)
