@@ -47,3 +47,12 @@ func (l *Logger) Error(ctx context.Context, msg string, err error, fields ...zap
 	fields = append(fields, zap.Error(err))
 	l.WithContext(ctx).Error(msg, fields...)
 }
+
+func (l *Logger) Warn(ctx context.Context, msg string, fields ...zap.Field) {
+	l.WithContext(ctx).Warn(msg, fields...)
+}
+
+func (l *Logger) Fatal(ctx context.Context, msg string, err error, fields ...zap.Field) {
+	fields = append(fields, zap.Error(err))
+	l.WithContext(ctx).Fatal(msg, fields...)
+}

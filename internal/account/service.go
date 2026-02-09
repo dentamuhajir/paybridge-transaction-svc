@@ -5,6 +5,7 @@ import (
 	"paybridge-transaction-service/internal/infra/logger"
 
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 type Service interface {
@@ -27,6 +28,9 @@ func (s *service) CreateAccountWithInitialBalances(ctx context.Context, userID u
 
 func (s *service) GetAccount(ctx context.Context, userID uuid.UUID) (Account, error) {
 	if userID == uuid.Nil {
+		s.log.Warn(ctx, "nil user id",
+			zap.String("operation", "GetAccount"),
+		)
 		return Account{}, ErrInvalidUserID
 	}
 
@@ -37,6 +41,10 @@ func (s *service) GetAccount(ctx context.Context, userID uuid.UUID) (Account, er
 	}
 
 	if account.Status != StatusActive {
+		s.log.Info(ctx, "account inactive",
+			zap.String("owner_id", userID.String()),
+			zap.String("status", string(account.Status)),
+		)
 		return Account{}, ErrAccountInactive
 	}
 

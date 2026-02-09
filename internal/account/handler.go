@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type Handler struct {
@@ -38,7 +39,13 @@ func (h *Handler) GetAccount(c echo.Context) error {
 
 	ownerIDStr := c.Param("owner_id")
 	ownerID, err := uuid.Parse(ownerIDStr)
+	h.log.Info(ctx, "get account request received",
+		zap.String("owner_id", ownerIDStr),
+	)
 	if err != nil {
+		h.log.Warn(ctx, "invalid owner_id format",
+			zap.String("owner_id", ownerIDStr),
+		)
 		return c.JSON(http.StatusBadRequest,
 			response.Error("invalid owner_id", http.StatusBadRequest),
 		)

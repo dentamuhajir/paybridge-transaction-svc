@@ -35,19 +35,13 @@ func (r *repository) GetAccount(ctx context.Context, ownerID uuid.UUID) (Account
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			r.log.Error(
-				ctx,
-				"account not found",
-				err,
+			r.log.Warn(ctx, "account not found",
 				zap.String("owner_id", ownerID.String()),
 			)
 
 			return Account{}, ErrAccountNotFound
 		}
-		r.log.Error(
-			ctx,
-			"failed to get account",
-			err,
+		r.log.Error(ctx, "failed to get account", err,
 			zap.String("owner_id", ownerID.String()),
 		)
 		return Account{}, err
