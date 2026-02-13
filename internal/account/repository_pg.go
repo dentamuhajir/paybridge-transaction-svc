@@ -7,6 +7,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -21,6 +23,7 @@ func NewRepository(db *pgxpool.Pool, log *logger.Logger) Repository {
 
 func (r *repository) GetAccount(ctx context.Context, ownerID uuid.UUID) (Account, error) {
 
+	span := trace.SpanFromContext(ctx)
 	var account Account
 	query := `
 		SELECT id, owner_id, status
@@ -38,6 +41,9 @@ func (r *repository) GetAccount(ctx context.Context, ownerID uuid.UUID) (Account
 			r.log.Warn(ctx, "account not found",
 				zap.String("owner_id", ownerID.String()),
 			)
+
+			span.RecordError(err)
+			span.SetStatus(codes.Error, "account not found")
 
 			return Account{}, ErrAccountNotFound
 		}
