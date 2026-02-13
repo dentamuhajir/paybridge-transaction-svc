@@ -2,6 +2,7 @@ package account
 
 import (
 	"net/http"
+	"sync/atomic"
 
 	"paybridge-transaction-service/internal/infra/logger"
 	"paybridge-transaction-service/internal/server/middleware"
@@ -15,6 +16,7 @@ import (
 type Handler struct {
 	service Service
 	log     *logger.Logger
+	counter int32
 }
 
 func NewHandler(svc Service, log *logger.Logger) *Handler {
@@ -35,7 +37,22 @@ func (h *Handler) RegisterInternalRoutes(g *echo.Group) {
 // @Security    BearerAuth
 // @Router      /account/{owner_id} [get]
 func (h *Handler) GetAccount(c echo.Context) error {
+
 	ctx := c.Request().Context()
+
+	count := atomic.AddInt32(&h.counter, 1)
+
+	h.log.Info(ctx, "retry test attempt",
+		zap.Int32("attempt", count),
+	)
+
+	// First 2 attempts -> 500
+	if count <= 2 {
+		return c.JSON(
+			http.StatusInternalServerError,
+			response.Error("temporary failure", http.StatusInternalServerError),
+		)
+	}
 
 	ownerIDStr := c.Param("owner_id")
 	ownerID, err := uuid.Parse(ownerIDStr)
