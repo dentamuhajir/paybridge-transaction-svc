@@ -5,12 +5,14 @@ import (
 	"paybridge-transaction-service/internal/config"
 	"paybridge-transaction-service/internal/infra/logger"
 	"paybridge-transaction-service/internal/infra/postgres"
+	"paybridge-transaction-service/internal/ledger"
+	"paybridge-transaction-service/internal/usecase"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Service struct {
-	AccountService account.Service
+	OpenAccountUsecase *usecase.OpenAccountUsecase
 }
 
 type Container struct {
@@ -31,17 +33,21 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 		return nil, err
 	}
 
-	// walletRepo := wallet.NewRepository(db, log)
-	// walletSvc := wallet.NewService(walletRepo, log)
 	accountRepo := account.NewRepository(db, log)
-	accountSvc := account.NewService(accountRepo, log)
+
+	ledgerRepo := ledger.NewRepository(db, log)
+	openAccountUC := usecase.NewOpenAccountUsecase(
+		db,
+		accountRepo,
+		ledgerRepo,
+	)
 
 	return &Container{
 		Cfg:    cfg,
 		DB:     db,
 		Logger: log,
 		Service: &Service{
-			AccountService: accountSvc,
+			OpenAccountUsecase: openAccountUC,
 		},
 	}, nil
 }

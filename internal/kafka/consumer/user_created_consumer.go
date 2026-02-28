@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"paybridge-transaction-service/internal/account"
 	"paybridge-transaction-service/internal/config"
 	"paybridge-transaction-service/internal/event"
 	kafkaInfra "paybridge-transaction-service/internal/infra/kafka"
+	"paybridge-transaction-service/internal/usecase"
 
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
@@ -19,13 +19,16 @@ type CreateUserEvent struct {
 
 type UserCreateConsumer struct {
 	reader  *kafka.Reader
-	Service account.Service
+	usecase *usecase.OpenAccountUsecase
 }
 
-func NewUserCreateConsumer(cfg *config.Config, svc account.Service) *UserCreateConsumer {
+func NewUserCreateConsumer(
+	cfg *config.Config,
+	uc *usecase.OpenAccountUsecase,
+) *UserCreateConsumer {
 	return &UserCreateConsumer{
 		reader:  kafkaInfra.NewReader(cfg, event.UserCreatedTopic),
-		Service: svc,
+		usecase: uc,
 	}
 }
 
@@ -46,9 +49,9 @@ func (c *UserCreateConsumer) Start(ctx context.Context) {
 			continue
 		}
 
-		if err := c.Service.CreateAccountWithInitialBalances(ctx, event.UserID); err != nil {
+		if err := c.usecase.ExecuteUserAccount(ctx, event.UserID); err != nil {
 			log.Println("Create account failed:", err)
-			continue // DO NOT COMMIT → Kafka will retry
+			continue // DO NOT COMMIT → Kafka retry
 		}
 
 		if err := c.reader.CommitMessages(ctx, msg); err != nil {

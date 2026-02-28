@@ -5,12 +5,13 @@ import (
 	"paybridge-transaction-service/internal/infra/logger"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type Service interface {
-	CreateAccountWithInitialBalances(ctx context.Context, userID uuid.UUID) error
+	CreateAccount(ctx context.Context, tx pgx.Tx, acc Account) (Account, error)
 	GetAccount(ctx context.Context, userID uuid.UUID) (Account, error)
 }
 
@@ -23,8 +24,8 @@ func NewService(repo Repository, log *logger.Logger) Service {
 	return &service{repo, log}
 }
 
-func (s *service) CreateAccountWithInitialBalances(ctx context.Context, userID uuid.UUID) error {
-	return s.repo.CreateAccountWithBalance(ctx, userID)
+func (s *service) CreateAccount(ctx context.Context, tx pgx.Tx, acc Account) (Account, error) {
+	return s.repo.CreateAccountTx(ctx, tx, acc)
 }
 
 func (s *service) GetAccount(ctx context.Context, userID uuid.UUID) (Account, error) {

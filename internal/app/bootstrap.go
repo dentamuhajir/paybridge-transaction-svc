@@ -35,16 +35,9 @@ func (b *Bootstrap) Start() error {
 	}()
 
 	// start kafka consumers
-	// walletConsumer := consumer.NewWalletCreateConsumer(
-	// 	b.container.Cfg,,
-	// 	b.container.Service.WalletService,
-	// )
-	// go walletConsumer.Start(ctx)
-
-	// start kafka consumers
 	userCreatedConsumer := consumer.NewUserCreateConsumer(
 		b.container.Cfg,
-		b.container.Service.AccountService,
+		b.container.Service.OpenAccountUsecase,
 	)
 
 	go userCreatedConsumer.Start(ctx)

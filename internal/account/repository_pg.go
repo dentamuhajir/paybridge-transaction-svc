@@ -56,64 +56,55 @@ func (r *repository) GetAccount(ctx context.Context, ownerID uuid.UUID) (Account
 	return account, nil
 }
 
-func (r *repository) CreateAccountWithBalance(ctx context.Context, userID uuid.UUID) error {
-	tx, err := r.db.BeginTx(ctx, pgx.TxOptions{})
+func (r *repository) CreateAccountTx(
+    ctx context.Context,
+    tx pgx.Tx,
+    acc Account,
+) (Account, error) {
 
-	committed := false
-	defer func() {
-		if !committed {
-			_ = tx.Rollback(ctx)
-		}
-	}()
+    query := `
+        INSERT INTO accounts (
+            owner_type,
+            owner_id,
+            account_code,
+            currency,
+            reference_type,
+            reference_id,
+            status
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,'ACTIVE')
+        ON CONFLICT (owner_type, owner_id, account_code, currency, reference_id)
+        DO UPDATE SET updated_at = NOW()
+        RETURNING id, owner_type, owner_id, account_code,
+                  currency, reference_type, reference_id,
+                  status, created_at, updated_at
+    `
 
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback(ctx)
-		}
-	}()
+    var created Account
 
-	var accountID uuid.UUID
+    err := tx.QueryRow(ctx, query,
+        acc.OwnerType,
+        acc.OwnerID,
+        acc.AccountCode,
+        acc.Currency,
+        acc.ReferenceType,
+        acc.ReferenceID,
+    ).Scan(
+        &created.ID,
+        &created.OwnerType,
+        &created.OwnerID,
+        &created.AccountCode,
+        &created.Currency,
+        &created.ReferenceType,
+        &created.ReferenceID,
+        &created.Status,
+        &created.CreatedAt,
+        &created.UpdatedAt,
+    )
 
-	err = tx.QueryRow(ctx, ` INSERT INTO accounts (owner_id, status) 
-			VALUES ($1, $2) ON CONFLICT (owner_id) 
-			DO NOTHING RETURNING id `, userID, StatusActive).Scan(&accountID)
+    if err != nil {
+        return Account{}, err
+    }
 
-	if err == pgx.ErrNoRows {
-		err = tx.QueryRow(ctx, `
-			SELECT id FROM accounts WHERE owner_id = $1
-		`, userID).Scan(&accountID)
-
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
-	}
-	_, err = tx.Exec(ctx, `
-	INSERT INTO account_balances (account_id, balance_type_id, amount)
-	VALUES
-		($1, $2, 0), 
-		($1, $3, 0), 
-		($1, $4, 0), 
-		($1, $5, 0), 
-		($1, $6, 0), 
-		($1, $7, 0)
-	ON CONFLICT DO NOTHING`,
-		accountID,
-		BalanceTypeCash,
-		BalanceTypeLoanPrincipal,
-		BalanceTypeLoanInterest,
-		BalanceTypeFee,
-		BalanceTypeEscrow,
-		BalanceTypeReserve)
-
-	if err != nil {
-		return err
-	}
-
-	if err = tx.Commit(ctx); err != nil {
-		return err
-	}
-	committed = true
-	return nil
+    return created, nil
 }
