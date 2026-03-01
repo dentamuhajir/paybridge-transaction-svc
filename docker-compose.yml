@@ -12,7 +12,8 @@ services:
       - .:/app
       - ~/.cache/go-build:/root/.cache/go-build
     env_file:
-      - .env
+      - path: .env
+        required: false
     networks:
       - paybridge_network
     restart: unless-stopped
@@ -20,3 +21,4 @@ services:
 networks:
   paybridge_network:
     external: true
+    
