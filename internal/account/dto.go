@@ -6,3 +6,7 @@ type AccountResponse struct {
 	OwnerID *uuid.UUID `json:"owner_id"`
 	Status  Status     `json:"status"`
 }
+
+type AccountBalanceResponse struct {
+	Balance int64 `json:"balance"`
+}

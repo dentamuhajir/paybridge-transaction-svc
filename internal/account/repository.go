@@ -10,4 +10,5 @@ import (
 type Repository interface {
 	GetAccount(ctx context.Context, userID uuid.UUID) (Account, error)
 	CreateAccountTx(ctx context.Context, tx pgx.Tx, acc Account) (Account, error)
+	GetAccountBalance(ctx context.Context, ownerID uuid.UUID) (int64, error)
 }

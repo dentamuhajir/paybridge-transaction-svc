@@ -41,6 +41,62 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/account/{owner_id}/balance": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve the current balance for an account by owner ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Internal Account"
+                ],
+                "summary": "Get account balance by owner ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Owner UUID",
+                        "name": "owner_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid owner_id format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "securityDefinitions": {
