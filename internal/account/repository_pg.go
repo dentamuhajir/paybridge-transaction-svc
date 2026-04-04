@@ -57,12 +57,12 @@ func (r *repository) GetAccount(ctx context.Context, ownerID uuid.UUID) (Account
 }
 
 func (r *repository) CreateAccountTx(
-    ctx context.Context,
-    tx pgx.Tx,
-    acc Account,
+	ctx context.Context,
+	tx pgx.Tx,
+	acc Account,
 ) (Account, error) {
 
-    query := `
+	query := `
         INSERT INTO accounts (
             owner_type,
             owner_id,
@@ -80,31 +80,61 @@ func (r *repository) CreateAccountTx(
                   status, created_at, updated_at
     `
 
-    var created Account
+	var created Account
 
-    err := tx.QueryRow(ctx, query,
-        acc.OwnerType,
-        acc.OwnerID,
-        acc.AccountCode,
-        acc.Currency,
-        acc.ReferenceType,
-        acc.ReferenceID,
-    ).Scan(
-        &created.ID,
-        &created.OwnerType,
-        &created.OwnerID,
-        &created.AccountCode,
-        &created.Currency,
-        &created.ReferenceType,
-        &created.ReferenceID,
-        &created.Status,
-        &created.CreatedAt,
-        &created.UpdatedAt,
-    )
+	err := tx.QueryRow(ctx, query,
+		acc.OwnerType,
+		acc.OwnerID,
+		acc.AccountCode,
+		acc.Currency,
+		acc.ReferenceType,
+		acc.ReferenceID,
+	).Scan(
+		&created.ID,
+		&created.OwnerType,
+		&created.OwnerID,
+		&created.AccountCode,
+		&created.Currency,
+		&created.ReferenceType,
+		&created.ReferenceID,
+		&created.Status,
+		&created.CreatedAt,
+		&created.UpdatedAt,
+	)
 
-    if err != nil {
-        return Account{}, err
-    }
+	if err != nil {
+		return Account{}, err
+	}
 
-    return created, nil
+	return created, nil
+}
+
+func (r *repository) GetAccountBalance(ctx context.Context, ownerID uuid.UUID) (int64, error) {
+	span := trace.SpanFromContext(ctx)
+
+	// Get the account first
+	account, err := r.GetAccount(ctx, ownerID)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "account not found")
+		return 0, err
+	}
+
+	// Query balance from account_balances table
+	var balance int64
+	query := `
+		SELECT balance
+		FROM account_balances
+		WHERE account_id = $1
+	`
+	err = r.db.QueryRow(ctx, query, account.ID).Scan(&balance)
+	if err != nil {
+		r.log.Error(ctx, "failed to get account balance", err,
+			zap.String("account_id", account.ID.String()),
+		)
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "failed to get account balance")
+		return 0, err
+	}
+	return balance, nil
 }

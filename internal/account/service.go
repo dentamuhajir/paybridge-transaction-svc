@@ -13,6 +13,7 @@ import (
 type Service interface {
 	CreateAccount(ctx context.Context, tx pgx.Tx, acc Account) (Account, error)
 	GetAccount(ctx context.Context, userID uuid.UUID) (Account, error)
+	GetAccountBalance(ctx context.Context, ownerID uuid.UUID) (int64, error)
 }
 
 type service struct {
@@ -59,4 +60,26 @@ func (s *service) GetAccount(ctx context.Context, userID uuid.UUID) (Account, er
 	}
 
 	return account, err
+}
+
+func (s *service) GetAccountBalance(ctx context.Context, ownerID uuid.UUID) (int64, error) {
+	span := trace.SpanFromContext(ctx)
+
+	if ownerID == uuid.Nil {
+		err := ErrInvalidUserID
+		s.log.Warn(ctx, "nil owner id")	
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return 0, ErrInvalidUserID
+	}
+
+
+	balance, err := s.repo.GetAccountBalance(ctx, ownerID)
+
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return 0, err
+	}
+	return balance, nil
 }

@@ -22,6 +22,43 @@ paths:
       summary: Get account by owner ID
       tags:
       - Internal Account
+  /account/{owner_id}/balance:
+    get:
+      description: Retrieve the current balance for an account by owner ID
+      parameters:
+      - description: Owner UUID
+        in: path
+        name: owner_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid owner_id format
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Account not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get account balance by owner ID
+      tags:
+      - Internal Account
 securityDefinitions:
   BearerAuth:
     description: Example "Bearer b32fd54c1593e77fb4a84"
