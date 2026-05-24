@@ -10,6 +10,7 @@ type Status string
 
 type Account struct {
 	ID            uuid.UUID
+	AccountNumber string
 	OwnerType     string
 	OwnerID       *uuid.UUID
 	AccountCode   string

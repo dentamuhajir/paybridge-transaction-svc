@@ -2,6 +2,7 @@ package account
 
 import (
 	"context"
+	"fmt"
 	"paybridge-transaction-service/internal/infra/logger"
 
 	"github.com/google/uuid"
@@ -61,9 +62,25 @@ func (r *repository) CreateAccountTx(
 	tx pgx.Tx,
 	acc Account,
 ) (Account, error) {
+	var sequence int64
+
+	err := tx.QueryRow(
+		ctx,
+		`SELECT nextval('account_number_seq')`,
+	).Scan(&sequence)
+
+	if err != nil {
+		return Account{}, err
+	}
+
+	accountNumber := fmt.Sprintf(
+		"12201%08d",
+		sequence,
+	)
 
 	query := `
         INSERT INTO accounts (
+			account_number,
             owner_type,
             owner_id,
             account_code,
@@ -72,17 +89,18 @@ func (r *repository) CreateAccountTx(
             reference_id,
             status
         )
-        VALUES ($1,$2,$3,$4,$5,$6,'ACTIVE')
+        VALUES ($1,$2,$3,$4,$5,$6,$7,'ACTIVE')
         ON CONFLICT (owner_type, owner_id, account_code, currency, reference_id)
         DO UPDATE SET updated_at = NOW()
-        RETURNING id, owner_type, owner_id, account_code,
+        RETURNING id,account_number, owner_type, owner_id, account_code,
                   currency, reference_type, reference_id,
                   status, created_at, updated_at
     `
 
 	var created Account
 
-	err := tx.QueryRow(ctx, query,
+	err = tx.QueryRow(ctx, query,
+		accountNumber,
 		acc.OwnerType,
 		acc.OwnerID,
 		acc.AccountCode,
@@ -91,6 +109,7 @@ func (r *repository) CreateAccountTx(
 		acc.ReferenceID,
 	).Scan(
 		&created.ID,
+		&created.AccountNumber,
 		&created.OwnerType,
 		&created.OwnerID,
 		&created.AccountCode,
